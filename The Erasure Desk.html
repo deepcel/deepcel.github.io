@@ -1,0 +1,540 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>The Erasure Desk</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Stencil+One&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a privacy officer's desk. The request form sits on the left like a sheet of paper; the right column is the shift ledger. Stamps land on the paper. */
+:root{
+  --desk:#dde3ea;
+  --desk-dot:#c7cfd9;
+  --paper:#fbfcfd;
+  --ink:#161b26;
+  --muted:#596377;
+  --rule:#c2cad5;
+  --carbon:#2a3dbd;
+  --carbon-soft:#e7eafb;
+  --red:#c0252d;
+  --green:#17724c;
+  --amber:#9c620f;
+  --shadow:rgba(22,27,38,.16);
+  --f-display:"Saira Stencil One", "Arial Black", Impact, sans-serif;
+  --f-body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --desk:#11151c; --desk-dot:#1f2530; --paper:#1c222c; --ink:#e7ebf1; --muted:#9aa4b6; --rule:#363f4d;
+    --carbon:#93a1ff; --carbon-soft:#262d48; --red:#ff6f6f; --green:#55d39b; --amber:#f1b55c; --shadow:rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --desk:#11151c; --desk-dot:#1f2530; --paper:#1c222c; --ink:#e7ebf1; --muted:#9aa4b6; --rule:#363f4d;
+  --carbon:#93a1ff; --carbon-soft:#262d48; --red:#ff6f6f; --green:#55d39b; --amber:#f1b55c; --shadow:rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--desk);
+  background-image:radial-gradient(var(--desk-dot) 1px, transparent 1.2px);
+  background-size:22px 22px;
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:17px;
+  line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));
+  padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:28px 56px;
+}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+
+/* Masthead */
+.mast{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 32px;align-items:end;border-bottom:3px solid var(--ink);padding-bottom:18px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(44px, 8vw, 92px);line-height:.9;margin:0;letter-spacing:.01em;text-wrap:balance}
+.brief{grid-column:1 / -1;max-width:68ch;margin:0;font-size:18px}
+.brief b{font-weight:600}
+.status{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.chip{font-family:var(--f-mono);font-size:13px;border:1.5px solid var(--ink);padding:6px 10px;white-space:nowrap;font-variant-numeric:tabular-nums;background:var(--paper)}
+.btn-sound{font:inherit;font-family:var(--f-mono);font-size:13px;background:transparent;color:var(--ink);border:1.5px dashed var(--muted);padding:6px 10px;cursor:pointer}
+.btn-sound:hover{border-style:solid}
+
+/* Main grid */
+.main{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:28px;align-items:start}
+
+/* The sheet */
+.stage{position:relative;min-width:0}
+.sheet{
+  position:relative;background:var(--paper);color:var(--ink);
+  box-shadow:0 1px 0 var(--rule), 0 18px 36px -18px var(--shadow), 0 2px 6px var(--shadow);
+  padding:28px clamp(18px, 4vw, 40px) 30px;
+  transform:rotate(-.4deg);
+  overflow:hidden;
+}
+.sheet.enter{animation:slideIn .45s cubic-bezier(.2,.8,.2,1)}
+.sheet.leave{animation:slideOut .3s ease-in forwards}
+@keyframes slideIn{from{transform:translateX(60px) rotate(2deg);opacity:0}to{transform:rotate(-.4deg);opacity:1}}
+@keyframes slideOut{to{transform:translateX(-80px) rotate(-4deg);opacity:0}}
+
+.formhead{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:16px}
+.formhead .t{font-family:var(--f-mono);font-weight:600;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+.formhead .s{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.fields{display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:0;border:1px solid var(--rule);margin-bottom:20px}
+.field{padding:8px 10px;border-right:1px solid var(--rule);min-width:0}
+.field:last-child{border-right:0}
+.field .k{display:block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.field .v{display:block;font-family:var(--f-mono);font-size:14px;overflow-wrap:anywhere}
+.letter{font-size:19px;line-height:1.55;margin:0 0 20px;max-width:60ch}
+.letter::before{content:"“";font-family:var(--f-display);color:var(--carbon);font-size:1.6em;line-height:0;vertical-align:-.35em;margin-right:4px}
+.note{border:1.5px dashed var(--muted);padding:12px 14px;font-family:var(--f-mono);font-size:14px;line-height:1.55}
+.note .k{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.note ul{margin:0;padding-left:18px}
+.note li+li{margin-top:4px}
+
+/* Stamp */
+.stamp{
+  position:absolute;right:clamp(10px,4vw,36px);top:86px;pointer-events:none;
+  font-family:var(--f-display);font-size:clamp(34px,6.5vw,60px);line-height:1;letter-spacing:.04em;
+  border:5px solid currentColor;padding:6px 14px 4px;border-radius:6px;
+  transform:rotate(-11deg);opacity:.86;text-align:center;
+}
+.stamp small{display:block;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;font-weight:600;margin:6px auto 2px;max-width:24ch;line-height:1.4}
+.stamp.erase{color:var(--green)}
+.stamp.refuse{color:var(--red)}
+.stamp.escalate{color:var(--amber)}
+.stamp.hit{animation:thud .28s cubic-bezier(.3,1.6,.5,1)}
+@keyframes thud{from{transform:rotate(-11deg) scale(1.9);opacity:0}to{transform:rotate(-11deg) scale(1);opacity:.86}}
+
+/* Actions */
+.desk{margin-top:22px;display:flex;flex-direction:column;gap:14px}
+.prompt{font-family:var(--f-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0}
+.stamps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.sbtn{
+  font-family:var(--f-display);font-size:clamp(20px,3vw,28px);letter-spacing:.05em;
+  background:var(--paper);border:3px solid currentColor;border-radius:6px;padding:12px 8px 8px;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s, box-shadow .12s;
+  box-shadow:0 4px 0 currentColor;
+}
+.sbtn span{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.04em;color:var(--muted);text-transform:none}
+.sbtn:hover{transform:translateY(-2px);box-shadow:0 6px 0 currentColor}
+.sbtn:active{transform:translateY(3px);box-shadow:0 1px 0 currentColor}
+.sbtn.erase{color:var(--green)} .sbtn.refuse{color:var(--red)} .sbtn.escalate{color:var(--amber)}
+.sbtn[aria-pressed="true"]{background:var(--carbon-soft)}
+button:focus-visible{outline:3px solid var(--carbon);outline-offset:3px}
+
+.grounds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.gbtn{
+  font:inherit;text-align:left;background:var(--paper);color:var(--ink);border:1.5px solid var(--rule);
+  padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;align-items:baseline
+}
+.gbtn:hover{border-color:var(--red)}
+.gbtn .n{font-family:var(--f-mono);font-weight:600;color:var(--red);grid-row:span 2}
+.gbtn .h{font-weight:600;font-size:16px;line-height:1.3}
+.gbtn .d{font-size:14px;color:var(--muted);line-height:1.4}
+.back{font:inherit;font-family:var(--f-mono);font-size:13px;background:none;border:0;color:var(--muted);cursor:pointer;padding:4px 0;justify-self:start;text-decoration:underline;text-underline-offset:3px}
+
+/* Verdict */
+.verdict{border-top:2px solid var(--ink);padding-top:16px;display:flex;flex-direction:column;gap:10px}
+.verdict .res{font-family:var(--f-mono);font-weight:600;font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.verdict .res.ok{color:var(--green)} .verdict .res.no{color:var(--red)}
+.verdict h3{font-family:var(--f-body);font-weight:600;font-size:21px;line-height:1.3;margin:0;text-wrap:balance}
+.verdict p{margin:0;max-width:64ch}
+.verdict .ask{font-style:italic;color:var(--muted)}
+.next{
+  align-self:flex-start;margin-top:6px;font-family:var(--f-mono);font-weight:600;font-size:15px;
+  background:var(--ink);color:var(--paper);border:0;padding:12px 18px;cursor:pointer
+}
+.next:hover{background:var(--carbon)}
+
+/* Ledger column */
+aside{display:flex;flex-direction:column;gap:20px;min-width:0}
+.panel{background:var(--paper);border:1.5px solid var(--ink);padding:16px 18px}
+.panel h2{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;margin:0 0 10px;color:var(--ink)}
+.facts{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;margin:0;font-size:15px}
+.facts dt{font-family:var(--f-mono);font-size:12px;color:var(--muted);padding-top:3px}
+.facts dd{margin:0;font-variant-numeric:tabular-nums}
+.thresh{font-size:14px;color:var(--muted);margin:10px 0 0;line-height:1.45}
+.ledger{list-style:none;margin:0;padding:0;font-family:var(--f-mono);font-size:13px}
+.ledger li{display:grid;grid-template-columns:5.2em minmax(0,1fr) auto;gap:8px;padding:7px 0;border-top:1px solid var(--rule);align-items:baseline}
+.ledger li:first-child{border-top:0}
+.ledger .mark{font-weight:600}
+.ledger .mark.ok{color:var(--green)} .ledger .mark.no{color:var(--red)}
+.ledger .pend{color:var(--muted)}
+.ledger .cur{color:var(--carbon);font-weight:600}
+.small{font-size:14px;color:var(--muted);margin:0;line-height:1.45}
+
+/* End report */
+.report{display:flex;flex-direction:column;gap:18px}
+.report .big{font-family:var(--f-display);font-size:clamp(56px,10vw,104px);line-height:.9;margin:0;font-variant-numeric:tabular-nums}
+.report .rank{font-family:var(--f-mono);font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--carbon);margin:0}
+.report h3{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:6px 0 0;color:var(--muted)}
+.report ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px;max-width:64ch}
+.restart{align-self:flex-start;font-family:var(--f-mono);font-weight:600;font-size:15px;background:transparent;color:var(--ink);border:2px solid var(--ink);padding:10px 16px;cursor:pointer}
+.restart:hover{background:var(--ink);color:var(--paper)}
+
+footer{border-top:1.5px solid var(--ink);padding-top:14px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;font-size:14px;color:var(--muted)}
+footer p{margin:0 0 6px;max-width:70ch}
+footer a{color:var(--carbon)}
+footer ul{margin:0;padding-left:18px}
+
+@media (max-width: 860px){
+  .main{grid-template-columns:minmax(0,1fr)}
+  footer{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width: 560px){
+  body{font-size:16px}
+  .mast{grid-template-columns:minmax(0,1fr)}
+  .status{justify-content:flex-start}
+  .fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .field:nth-child(2){border-right:0}
+  .field:nth-child(-n+2){border-bottom:1px solid var(--rule)}
+  .stamps{grid-template-columns:minmax(0,1fr)}
+  .sbtn{flex-direction:row;justify-content:center;gap:12px}
+  .grounds{grid-template-columns:minmax(0,1fr)}
+  .letter{font-size:17px}
+  .stamp{top:120px}
+}
+@media (prefers-reduced-motion: reduce){
+  .sheet.enter,.sheet.leave,.stamp.hit{animation:none}
+  .sbtn,.sbtn:hover,.sbtn:active{transition:none;transform:none}
+}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <p class="eyebrow">Internet Law zine · Module 3 · A game of the proposed APP 14</p>
+      <h1>The Erasure Desk</h1>
+    </div>
+    <div class="status" aria-live="polite">
+      <span class="chip" id="chipReq">Request 1 / 9</span>
+      <span class="chip" id="chipScore">Correct 0</span>
+      <button class="btn-sound" id="soundBtn" type="button" aria-pressed="true">Sound: on</button>
+    </div>
+    <p class="brief">Imagine the 2026 exposure draft has passed exactly as written. You are the privacy officer at <b>Chirp</b>, a social media service. Under the new APP 14 it counts as a large digital platform, so it must destroy a person's information when they ask, unless one of six refusal grounds applies. Nine requests are in the tray. Stamp each one <b>Erase</b>, <b>Refuse</b> (on one ground) or <b>Escalate</b> if the law genuinely doesn't say.</p>
+  </header>
+
+  <div class="main">
+    <section class="stage" aria-label="Current request">
+      <article class="sheet enter" id="sheet"></article>
+    </section>
+
+    <aside>
+      <div class="panel">
+        <h2>Chirp at a glance</h2>
+        <dl class="facts">
+          <dt>Service</dt><dd>Social media service (Online Safety Act definition)</dd>
+          <dt>Users</dt><dd>6.1 million average Australian end-users</dd>
+          <dt>Revenue</dt><dd>$1.4 billion group revenue</dd>
+          <dt>Status</dt><dd>Large digital platform: APP 14 applies</dd>
+        </dl>
+        <p class="thresh">Under the draft, the erasure right reaches only large platforms: those with at least $500 million in group revenue and/or 2.5 million average Australian end-users. Chirp clears both bars.</p>
+      </div>
+      <div class="panel">
+        <h2>Shift ledger</h2>
+        <ul class="ledger" id="ledger"></ul>
+      </div>
+      <div class="panel">
+        <h2>How to play</h2>
+        <p class="small">Read the letter, then the internal file note. Facts in the note usually decide the case. A refusal needs the right ground, not just the right stamp. Save Escalate for the one question the draft leaves open.</p>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    <div>
+      <p>Chirp and every requester are invented. The rules come from the Attorney-General's August 2026 exposure draft, the Privacy Amendment (Personal Data Protection) Bill 2026, as summarised in the Module 3 notes. The Bill may change before it passes. This is a learning game, not legal advice.</p>
+    </div>
+    <div>
+      <ul>
+        <li><a href="https://consultations.ag.gov.au/rights-and-protections/privacy-reform/user_uploads/exposure-draft-bill-2026.pdf" target="_blank" rel="noopener">Exposure draft Bill (2026)</a></li>
+        <li><a href="https://consultations.ag.gov.au/rights-and-protections/privacy-reform/user_uploads/consultation_paper.pdf" target="_blank" rel="noopener">Consultation paper, pp 33–35</a></li>
+        <li><a href="https://www.ag.gov.au/sites/default/files/2023-02/privacy-act-review-report_0.pdf" target="_blank" rel="noopener">Privacy Act Review Report 2022</a></li>
+      </ul>
+    </div>
+  </footer>
+</div>
+
+<script>
+const GROUNDS = {
+  vexatious: {h:"Frivolous or vexatious", d:"The request is an abuse of the process. The draft doesn't define the term."},
+  law:       {h:"Required or authorised by law", d:"Another law requires or permits Chirp to keep it."},
+  infeasible:{h:"Technically impossible or infeasible", d:"Chirp took reasonable steps, but destruction can't be done."},
+  necessary: {h:"Strictly necessary for a service they asked for", d:"Chirp can't provide something the person requested without it."},
+  permitted: {h:"Permitted general or health situation", d:"An exception such as a legal claim or a serious threat to safety."},
+  processor: {h:"Chirp is only the processor", d:"Chirp holds it on behalf of another business that controls it."}
+};
+const GORDER = ["vexatious","law","infeasible","necessary","permitted","processor"];
+
+const CASES = [
+  {
+    ref:"ERQ-0412", time:"09:04", from:"Mia T., Bendigo", via:"In-app form",
+    letter:"I closed my Chirp account last month. Please delete everything you still hold about me: my old posts, my messages and my contacts list.",
+    note:["Account closed 28 days ago. Posts, messages and contacts are still on live servers.","No unpaid bills, no legal hold, no open complaints.","No business customer involved. Chirp decides what it keeps."],
+    answer:{type:"erase"},
+    title:"Erase. This is the case the right was written for.",
+    explain:"Chirp is captured by APP 14 and none of the six grounds applies, so it must destroy the information. Closing an account is not the same thing: until now, a closed account's data could sit on Chirp's servers indefinitely.",
+    ask:"Should destruction also cover what Chirp inferred about Mia, like her ad-interest profile?"
+  },
+  {
+    ref:"ERQ-0413", time:"09:31", from:"Raj P., café owner", via:"Email",
+    letter:"I've moved my advertising to another platform. Delete every record of the ads I bought on Chirp last year, including the invoices.",
+    note:["Invoices and payment records for Raj's ad purchases, FY2025–26.","Finance confirms tax record-keeping rules require Chirp to keep its own transaction records for five years.","Raj has no other Chirp account."],
+    answer:{type:"refuse", ground:"law"},
+    title:"Refuse: retention is required by law.",
+    explain:"Chirp's tax obligations require it to keep these records, so the 'required or authorised by law' ground applies. The refusal only covers what the law actually requires. If Raj also had a personal profile on Chirp, that would still be erasable.",
+    ask:"Should Chirp have to tell Raj which law it is relying on, and when the records will be destroyed?"
+  },
+  {
+    ref:"ERQ-0414", time:"10:02", from:"Jordan K., Hobart", via:"In-app form",
+    letter:"Erase my mobile number from your systems. I still want my two-factor login codes sent by text, though.",
+    note:["Account active.","The number is the two-factor channel Jordan set up and still uses.","Marketing team also has the number in a promotions list."],
+    answer:{type:"refuse", ground:"necessary"},
+    title:"Refuse (in part): the number is strictly necessary for a service Jordan asked for.",
+    explain:"Chirp can't text login codes without the number, and Jordan asked for that service. 'Strictly necessary' is narrow, though. It covers the security copy, not the promotions list. That copy has nothing to do with the service Jordan requested, so Chirp should erase it.",
+    ask:"Where is the line between what a service needs and what a platform finds useful?"
+  },
+  {
+    ref:"ERQ-0415", time:"10:47", from:"anon_9931", via:"Email ×58",
+    letter:"DELETE MY DATA DELETE MY DATA DELETE MY DATA. (The same message, 58 times in 24 hours.)",
+    note:["This account was fully erased on 3 September. The requester confirmed receipt in writing.","A full search finds no remaining records linked to this person.","No new information in any of the 58 emails."],
+    answer:{type:"refuse", ground:"vexatious"},
+    title:"Refuse: frivolous or vexatious.",
+    explain:"Everything has already been destroyed and the repeat requests add nothing. The draft doesn't define 'frivolous or vexatious', so courts and the OAIC will eventually have to. This one is easy. Harder cases are persistent requesters with a real grievance, and Chirp shouldn't use this ground to brush them off.",
+    ask:"Who should decide what counts as vexatious: the platform, the OAIC or a court?"
+  },
+  {
+    ref:"ERQ-0416", time:"11:20", from:"Sam W., former employee of Harbour Logistics", via:"Email",
+    letter:"Harbour Logistics stored my performance reviews in Chirp Workspace. I've left the company. Please delete them.",
+    note:["Chirp Workspace is a paid business tool.","Harbour Logistics decides what is stored and why. Chirp only hosts and processes files for it under contract.","Sam also has a personal Chirp social account."],
+    answer:{type:"refuse", ground:"processor"},
+    title:"Refuse: Chirp is acting as a processor.",
+    explain:"Harbour Logistics controls the reviews, so Sam's request belongs with the employer. The ground is limited to Chirp's processor role. Sam's personal social account is information Chirp controls, so that part stays erasable if Sam asks.",
+    ask:"Should a platform at least forward the request to its business customer?"
+  },
+  {
+    ref:"ERQ-0417", time:"13:05", from:"Lena O., Fremantle", via:"In-app form",
+    letter:"Delete every copy of my data, including your backups. I mean every copy.",
+    note:["Live copies and rolling backups deleted on Monday.","One copy remains on a 2024 disaster-recovery archive. It is write-once tape, and engineering confirms it can't be edited without destroying the whole archive.","The archive is sealed and due for destruction in 2027."],
+    answer:{type:"refuse", ground:"infeasible"},
+    title:"Refuse (the leftover only): technically infeasible despite reasonable steps.",
+    explain:"Chirp did the work first. It deleted the live data and the rolling backups, and the ground covers only the copy it truly can't reach. Chirp's APP 11 security duties still apply to the sealed tape until it's destroyed. Tell Lena exactly what was erased and what is left.",
+    ask:"Could 'infeasible' become a loophole if platforms design systems that are hard to delete from?"
+  },
+  {
+    ref:"ERQ-0418", time:"14:12", from:"Dale M., Penrith", via:"In-app form",
+    letter:"Delete the posts I made last March. I'm entitled to have them gone.",
+    note:["The posts contain threats aimed at another Chirp user.","That user has started legal proceedings against Dale. Chirp's trust and safety team preserved the posts as evidence.","No court order has been served on Chirp yet."],
+    answer:{type:"refuse", ground:"permitted"},
+    title:"Refuse: a permitted general situation applies.",
+    explain:"The Privacy Act's permitted general situations include keeping information that is reasonably necessary to establish, exercise or defend a legal claim, and acting to lessen a serious threat to someone's safety. Erasing the evidence would undermine the other user's case. With no court order yet, 'required by law' is the weaker fit.",
+    ask:"Should the person who was threatened get a say in whether the posts are destroyed?"
+  },
+  {
+    ref:"ERQ-0419", time:"15:40", from:"Priya S., 18, Wollongong", via:"In-app form",
+    letter:"When I was 13 I posted heaps of embarrassing photos and rants. Please wipe all of it. I'm keeping my account.",
+    note:["Account active. Posts and photos date from 2021–22.","No legal hold, no business customer, nothing in backups beyond the normal cycle.","Priya will still need her login details and current settings."],
+    answer:{type:"erase"},
+    title:"Erase. Keeping the account doesn't block it.",
+    explain:"The 'strictly necessary' ground covers what Chirp needs to run the account Priya still uses, such as her login details. Old posts from when she was 13 aren't needed for that. Children's privacy runs through the reforms: the draft's 'fair and reasonable' test treats a child's best interests as a primary consideration, and a Children's Online Privacy Code is due by December 2026.",
+    ask:"Should information posted as a child be easier to erase than anything else?"
+  },
+  {
+    ref:"ERQ-0420", time:"16:55", from:"Tomás R., photographer", via:"Email",
+    letter:"Chirp used my public photos, including my face, to train its image-recognition model. Delete the photos, and remove me from the model.",
+    note:["The original photos can be deleted today.","The model is already trained. Engineers can't say whether deleting the photos changes what the model has learned.","Retraining from scratch would cost about $3 million."],
+    answer:{type:"escalate"},
+    title:"Escalate. The draft doesn't answer this.",
+    explain:"Deleting the photos themselves is straightforward. The open question is the model. The draft doesn't say whether destroying the source material is enough or whether outputs derived from it must also go, and the course notes flag this as a key issue raised since the draft's release (see the consultation paper, pp 33–35). Facial data used to identify someone is also biometric, sensitive information, which the new consent test targets.",
+    ask:"If a model can still recognise Tomás after the photos are gone, has his information been destroyed?"
+  }
+];
+
+const RANKS = [
+  [9,"Chief Privacy Officer"],
+  [7,"Senior Privacy Analyst"],
+  [4,"Graduate on probation"],
+  [0,"Referred to the OAIC"]
+];
+
+let S = {i:0, phase:"decide", log:[]};
+let pendingType = null;
+
+/* ---------- Sound (Web Audio, starts only after a click) ---------- */
+let soundOn = true, actx = null;
+try{ const v = localStorage.getItem("erasure-sound"); if(v==="off") soundOn=false; }catch(e){}
+function ctx(){ if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ actx=null; } } return actx; }
+function noise(c, dur){
+  const b = c.createBuffer(1, Math.floor(c.sampleRate*dur), c.sampleRate), d=b.getChannelData(0);
+  for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+  const s=c.createBufferSource(); s.buffer=b; return s;
+}
+function sfxStamp(){
+  if(!soundOn) return; const c=ctx(); if(!c) return; const t=c.currentTime;
+  const o=c.createOscillator(), g=c.createGain(); o.type="sine";
+  o.frequency.setValueAtTime(140,t); o.frequency.exponentialRampToValueAtTime(45,t+.18);
+  g.gain.setValueAtTime(.55,t); g.gain.exponentialRampToValueAtTime(.001,t+.22);
+  o.connect(g).connect(c.destination); o.start(t); o.stop(t+.25);
+  const n=noise(c,.08), f=c.createBiquadFilter(), ng=c.createGain(); f.type="lowpass"; f.frequency.value=900;
+  ng.gain.setValueAtTime(.35,t); ng.gain.exponentialRampToValueAtTime(.001,t+.08);
+  n.connect(f).connect(ng).connect(c.destination); n.start(t);
+}
+function sfxPaper(){
+  if(!soundOn) return; const c=ctx(); if(!c) return; const t=c.currentTime;
+  const n=noise(c,.35), f=c.createBiquadFilter(), g=c.createGain(); f.type="bandpass"; f.Q.value=.8;
+  f.frequency.setValueAtTime(1800,t); f.frequency.exponentialRampToValueAtTime(5200,t+.3);
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.12,t+.06); g.gain.exponentialRampToValueAtTime(.001,t+.34);
+  n.connect(f).connect(g).connect(c.destination); n.start(t);
+}
+function sfxTone(ok){
+  if(!soundOn) return; const c=ctx(); if(!c) return; const t=c.currentTime+.18;
+  const notes = ok ? [660,880] : [300,240];
+  notes.forEach((fq,k)=>{ const o=c.createOscillator(), g=c.createGain(); o.type="triangle"; o.frequency.value=fq;
+    g.gain.setValueAtTime(.0001,t+k*.11); g.gain.exponentialRampToValueAtTime(.12,t+k*.11+.02); g.gain.exponentialRampToValueAtTime(.001,t+k*.11+.2);
+    o.connect(g).connect(c.destination); o.start(t+k*.11); o.stop(t+k*.11+.22); });
+}
+const soundBtn = document.getElementById("soundBtn");
+function paintSound(){ soundBtn.textContent = "Sound: " + (soundOn?"on":"off"); soundBtn.setAttribute("aria-pressed", String(soundOn)); }
+soundBtn.addEventListener("click", ()=>{ soundOn=!soundOn; paintSound(); try{ localStorage.setItem("erasure-sound", soundOn?"on":"off"); }catch(e){} if(soundOn){ ctx(); sfxPaper(); } });
+paintSound();
+
+/* ---------- Rendering ---------- */
+const $sheet = document.getElementById("sheet");
+const esc = s => String(s).replace(/[&<>"]/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
+function label(a){ if(!a) return ""; if(a.type==="erase") return "Erase"; if(a.type==="escalate") return "Escalate"; return "Refuse: " + GROUNDS[a.ground].h; }
+function short(a){ if(a.type==="erase") return "Erase"; if(a.type==="escalate") return "Escalate"; return "Refuse"; }
+function score(){ return S.log.filter(l=>l.ok).length; }
+
+function renderStatus(){
+  document.getElementById("chipReq").textContent = S.i < CASES.length ? `Request ${S.i+1} / ${CASES.length}` : `Shift over`;
+  document.getElementById("chipScore").textContent = `Correct ${score()}`;
+  const L = document.getElementById("ledger");
+  L.innerHTML = CASES.map((c,k)=>{
+    const l = S.log[k];
+    if(l) return `<li><span>${c.ref}</span><span>${esc(short(l.pick))}</span><span class="mark ${l.ok?"ok":"no"}">${l.ok?"✓ right":"✗ wrong"}</span></li>`;
+    if(k===S.i && S.i<CASES.length) return `<li><span class="cur">${c.ref}</span><span class="cur">On your desk</span><span class="cur">…</span></li>`;
+    return `<li><span class="pend">${c.ref}</span><span class="pend">In tray</span><span class="pend">·</span></li>`;
+  }).join("");
+}
+
+function sheetHead(c){
+  return `
+    <div class="formhead"><span class="t">Request for erasure · APP 14</span><span class="s">Chirp Pty Ltd · Privacy Office</span></div>
+    <div class="fields">
+      <div class="field"><span class="k">Ref</span><span class="v">${c.ref}</span></div>
+      <div class="field"><span class="k">Received</span><span class="v">${c.time}</span></div>
+      <div class="field"><span class="k">From</span><span class="v">${esc(c.from)}</span></div>
+      <div class="field"><span class="k">Channel</span><span class="v">${esc(c.via)}</span></div>
+    </div>
+    <p class="letter">${esc(c.letter)}</p>
+    <div class="note"><span class="k">Internal file note</span><ul>${c.note.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>`;
+}
+
+function render(){
+  renderStatus();
+  if(S.i >= CASES.length){ renderReport(); return; }
+  const c = CASES[S.i];
+  const l = S.log[S.i];
+  let html = sheetHead(c);
+  if(l){
+    const p = l.pick;
+    const stampSub = p.type==="refuse" ? `<small>${esc(GROUNDS[p.ground].h)}</small>` : "";
+    html += `<div class="stamp ${p.type}${l.fresh?" hit":""}" aria-hidden="true">${p.type==="erase"?"ERASED":p.type==="refuse"?"REFUSED":"ESCALATED"}${stampSub}</div>`;
+    let res;
+    if(l.ok) res = `<span class="res ok">✓ Correct call</span>`;
+    else if(p.type==="refuse" && c.answer.type==="refuse") res = `<span class="res no">✗ Right stamp, wrong ground</span>`;
+    else if(p.type==="escalate") res = `<span class="res no">✗ The draft does answer this one</span>`;
+    else res = `<span class="res no">✗ Not quite</span>`;
+    html += `<div class="desk"><div class="verdict" role="status">
+      ${res}
+      ${l.ok?"":`<p class="small">You chose: ${esc(label(p))}</p>`}
+      <h3>${esc(c.title)}</h3>
+      <p>${esc(c.explain)}</p>
+      <p class="ask">Think about it: ${esc(c.ask)}</p>
+      <button class="next" id="nextBtn" type="button">${S.i===CASES.length-1?"End shift →":"Next request →"}</button>
+    </div></div>`;
+  } else if(S.phase==="refuse"){
+    html += `<div class="desk">
+      <p class="prompt">Refuse on which ground?</p>
+      <div class="grounds">${GORDER.map((g,k)=>`<button class="gbtn" type="button" data-g="${g}"><span class="n">${k+1}</span><span class="h">${esc(GROUNDS[g].h)}</span><span class="d">${esc(GROUNDS[g].d)}</span></button>`).join("")}</div>
+      <button class="back" id="backBtn" type="button">← Back to the stamps</button>
+    </div>`;
+  } else {
+    html += `<div class="desk">
+      <p class="prompt">Your call</p>
+      <div class="stamps">
+        <button class="sbtn erase" type="button" data-a="erase">ERASE<span>Destroy it</span></button>
+        <button class="sbtn refuse" type="button" data-a="refuse">REFUSE<span>Pick a ground</span></button>
+        <button class="sbtn escalate" type="button" data-a="escalate">ESCALATE<span>The law is unclear</span></button>
+      </div>
+    </div>`;
+  }
+  $sheet.innerHTML = html;
+  if(l) l.fresh = false;
+  bind();
+}
+
+function bind(){
+  $sheet.querySelectorAll(".sbtn").forEach(b=>b.addEventListener("click", ()=>{
+    const a = b.dataset.a;
+    if(a==="refuse"){ S.phase="refuse"; sfxPaper(); render(); const f=$sheet.querySelector(".gbtn"); f&&f.focus(); return; }
+    decide({type:a});
+  }));
+  $sheet.querySelectorAll(".gbtn").forEach(b=>b.addEventListener("click", ()=>decide({type:"refuse", ground:b.dataset.g})));
+  const back = document.getElementById("backBtn"); if(back) back.addEventListener("click", ()=>{ S.phase="decide"; render(); });
+  const nx = document.getElementById("nextBtn"); if(nx){ nx.addEventListener("click", next); nx.focus({preventScroll:true}); }
+  const rs = document.getElementById("restartBtn"); if(rs) rs.addEventListener("click", restart);
+}
+
+function decide(pick){
+  const a = CASES[S.i].answer;
+  const ok = pick.type===a.type && (a.type!=="refuse" || pick.ground===a.ground);
+  S.log[S.i] = {pick, ok, fresh:true};
+  S.phase = "verdict";
+  sfxStamp(); sfxTone(ok);
+  render();
+}
+
+function next(){
+  const go = ()=>{ S.i++; S.phase="decide"; $sheet.classList.remove("leave"); $sheet.classList.remove("enter"); void $sheet.offsetWidth; $sheet.classList.add("enter"); sfxPaper(); render(); window.scrollTo({top: Math.max(0, $sheet.getBoundingClientRect().top + window.scrollY - 20), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); };
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){ go(); return; }
+  $sheet.classList.remove("enter"); $sheet.classList.add("leave");
+  setTimeout(go, 280);
+}
+
+function restart(){ S = {i:0, phase:"decide", log:[]}; $sheet.classList.remove("enter"); void $sheet.offsetWidth; $sheet.classList.add("enter"); sfxPaper(); render(); }
+
+function renderReport(){
+  const sc = score();
+  const rank = RANKS.find(r=>sc>=r[0])[1];
+  const missed = CASES.map((c,k)=>({c,l:S.log[k]})).filter(x=>x.l && !x.l.ok);
+  $sheet.innerHTML = `
+    <div class="formhead"><span class="t">End-of-shift report</span><span class="s">Chirp Pty Ltd · Privacy Office</span></div>
+    <div class="report">
+      <p class="big">${sc} / ${CASES.length}</p>
+      <p class="rank">${esc(rank)}</p>
+      ${missed.length ? `<h3>Calls to revisit</h3><ol>${missed.map(x=>`<li><b>${x.c.ref}</b>: you chose ${esc(label(x.l.pick))}. Answer: ${esc(label(x.c.answer))}.</li>`).join("")}</ol>` : `<p>A clean shift. Every call matched the draft.</p>`}
+      <h3>Questions for the tutorial</h3>
+      <ol>
+        <li>The draft limits this right to large digital platforms. The 2022 Privacy Act Review proposed a broader right covering all APP entities. Who misses out under the narrower version?</li>
+        <li>None of the six refusal grounds mentions freedom of expression or the public interest. The GDPR (Article 17) and the 2023 de-indexing proposal both allow those exceptions. Should APP 14?</li>
+        <li>Request ERQ-0420 had no clear answer. How should the law treat personal information that has been absorbed into an AI model?</li>
+      </ol>
+      <button class="restart" id="restartBtn" type="button">Start a new shift</button>
+    </div>`;
+  bind();
+}
+
+/* ---------- Boot (keeps progress across live updates) ---------- */
+function start(data){
+  if(data && typeof data.i==="number" && Array.isArray(data.log)){ S = {i:data.i, phase:data.phase||"decide", log:data.log.map(l=>l?{...l,fresh:false}:l)}; }
+  render();
+}
+window.claude?.hot?.snapshot?.(()=>({i:S.i, phase:S.phase, log:S.log}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
+
+</body></html>
